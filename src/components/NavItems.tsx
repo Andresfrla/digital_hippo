@@ -12,7 +12,7 @@ const NavItems = () => {
   const isAnyOpen = activeIndex !== null
 
   return (
-    <div className="flex gpa-4 h-full">
+    <div className="flex gap-4 h-full">
       {PRODUCT_CATEGORIES.map((category, i) => {
         
         const handleOpen = () => {

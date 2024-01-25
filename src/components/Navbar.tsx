@@ -18,7 +18,7 @@ const Navbar = () => {
                             </Link>
                         </div>
 
-                        <div className="hidden z-50 lg:ml-8 lg:block lg:self-strech">
+                        <div className="hidden z-50 lg:ml-8 lg:block lg:self-stretch">
                             <NavItems />
                         </div>
                     </div>
