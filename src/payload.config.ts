@@ -1,5 +1,8 @@
 import { buildConfig } from "payload/config";
-import { moongoseAdapter } from "mongoDB"
+import { mongooseAdapter } from "@payloadcms/db-mongodb"
+import { slateEditor } from "@payloadcms/richtext-slate";
+import { webpackBundler } from "@payloadcms/bundler-webpack";
+import path from "path";
 
 export default buildConfig({
     serverURL: process.env.NEXT_PUBLICK_SERVER || '',
@@ -7,7 +10,22 @@ export default buildConfig({
     routes: {
         admin: '/sell'
     },
-    admin: {},
+    admin: {
+        bundler: webpackBundler(),
+        meta: {
+            titleSuffix: '- DigitalHippo',
+            favicon: '/favicon.ico',
+            ogImage: '/thumbnail.jpg'
+        }
+    },
+    rateLimit: {
+        max: 2000,
+    },
     editor: slateEditor({}),
-    db: mongooseAdapter()
+    db: mongooseAdapter({
+        url: process.env.MONGOBD_URL!
+    }),
+    typescript: {
+        outputFile: path.resolve(__dirname, 'payload-types.js')
+    }
 })
