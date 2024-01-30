@@ -10,7 +10,7 @@ import Link from "next/link"
 import { useForm } from "react-hook-form"
 import { zodResolver } from '@hookform/resolvers/zod'
 import { AuthCredentialValidatior, TAuthCredentialsValidator } from "@/lib/validators/account-credentials-validator"
-import { trpc } from "@/trcp/client"
+import { trpc } from "@/trpc/client"
 
 
 const Page = () => {
@@ -25,13 +25,21 @@ const Page = () => {
     resolver: zodResolver(AuthCredentialValidatior),
   })
 
-  const {mutate, isLoading} = trpc.auth.createPayloadUser.useMutation({
+  const {mutate, isLoading} = trpc.auth.createPayloadUser.useMutation({})
 
-  })
-
-  const onSubmit = ({email, password}: TAuthCredentialsValidator) => {
-    mutate({email, password})
-  }
+  const onSubmit = async ({
+    email, 
+    password,
+  }: TAuthCredentialsValidator) => {
+    try {
+      await mutate({ email, password });
+      console.log("Mutation successful");
+      // Puedes realizar acciones adicionales después de la mutación aquí
+    } catch (error) {
+      console.error("Error during mutation:", error);
+      // Puedes manejar errores de la mutación aquí
+    }
+  };
 
   return (
     <>
@@ -70,6 +78,7 @@ const Page = () => {
                   <Label htmlFor="password">Password</Label>
                   <Input 
                   {...register("password")}
+                  type="password"
                   className={cn({
                     "focus-visible:ring-red-500": errors.password
                   })}
