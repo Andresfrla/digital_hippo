@@ -26,17 +26,14 @@ const Page = () => {
 
   const {mutate, isLoading} = trpc.auth.createPayloadUser.useMutation({})
 
-  const onSubmit = async ({
+  const onSubmit = ({
     email, 
     password,
   }: TAuthCredentialsValidator) => {
     try {
-      await mutate({ email, password });
-      console.log("Mutation successful");
-      // Puedes realizar acciones adicionales después de la mutación aquí
+      mutate({ email, password });
     } catch (error) {
       console.error("Error during mutation:", error);
-      // Puedes manejar errores de la mutación aquí
     }
   };
 
