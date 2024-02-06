@@ -118,7 +118,7 @@ export const Products: CollectionConfig = {
                     name: "image",
                     type: "upload",
                     relationTo: "media",
-                    required: true,
+                    required: true
                 }
             ]
         }
