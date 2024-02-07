@@ -15,7 +15,15 @@ const AddToCartButton = () => {
     },[])
 
   return (
-    <Button size='lg' className="w-full">Add To cart</Button>
+    <Button 
+    onClick={() => {
+        setIsSuccess(true)
+    }}
+    size='lg'
+    className="w-full"
+    >
+    {isSuccess ? 'Added!' : 'Add to cart'}
+    </Button>
   )
 }
 
