@@ -5,6 +5,8 @@ import "swiper/css/pagination"
 import { useEffect, useState } from 'react'
 import SwiperType from "swiper"
 import { Pagination } from 'swiper/modules'
+import { cn } from '@/lib/utils'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 interface ImageSlidersProps {
     urls: string[]
 }
@@ -34,11 +36,41 @@ function ImageSlider({urls}: ImageSlidersProps) {
   return (
     <div className="group relative bg-zing-100 aspect-square overflow-hidden rounded-xl">
         <div className="absolute z-10 inset-0 opacity-0 group-hover:opacity-100 transition">
-            <button></button>
-            <button></button>
+            <button 
+            onClick={(e) => {
+                e.preventDefault()
+                swiper?.slideNext()
+            }}
+            className={cn(activeStyles, "right-3 transition", {
+                [inactiveStyles]: slideConfig.isEnd,
+                "hover:bg-primary-300 text-primary-800 opacity-100": !slideConfig.isEnd
+            }
+            )}
+            aria-label='next image'>
+                <ChevronRight className='size-4 text-zinc-700' />{'  '}
+            </button>
+            <button 
+            onClick={(e) => {
+                e.preventDefault()
+                swiper?.slidePrev()
+            }}
+            className={cn(activeStyles, "left-3 transition", {
+                [inactiveStyles]: slideConfig.isBeginning,
+                "hover:bg-primary-300 text-primary-800 opacity-100": !slideConfig.isBeginning
+            }
+            )}
+            aria-label='previous image'>
+                <ChevronLeft className='size-4 text-zinc-700' />{'  '}
+            </button>
         </div>
 
-        <Swiper onSwiper={(swiper) => setSwiper(swiper)} 
+        <Swiper 
+        pagination={{
+            renderBullet: (_, className) => {
+                return `<span class="rounded-full transition ${className}"></span>`
+            }
+        }}
+        onSwiper={(swiper) => setSwiper(swiper)} 
         spaceBetween={50}
         modules={[Pagination]}
         slidesPerView={1}
