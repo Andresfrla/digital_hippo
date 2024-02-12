@@ -3,7 +3,10 @@ import Image from 'next/image'
 import React from 'react'
 import { cookies } from 'next/headers'
 import { getPayloadClient } from '@/get-payload'
-import { notFound } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
+import { Product, ProductFile } from '@/payload-types'
+import { PRODUCT_CATEGORIES } from '@/config'
+import { formatPrice } from '@/lib/utils'
 
 interface PageProps {
     searchParams: {
@@ -32,6 +35,17 @@ const ThankYouPage = async ({searchParams} : PageProps) => {
 
     if(!order) return notFound()
 
+    const orderUserId = 
+    typeof order.user === "string" 
+    ? order.user 
+    : order.user.id
+
+    if(orderUserId !== user?.id){
+        return redirect(`/sign-in?origin=thank-you?orderId=${order.id}`)
+    }
+
+    const orderTotal
+
   return (
     <main className='relative lg:min-h-full'>
         <div className='hidden lg:block h-80 overflow-hidden lg:absolute lg:h-full lg:w-1/2 lg:pr-4 xl:pr-12'>
@@ -50,6 +64,84 @@ const ThankYouPage = async ({searchParams} : PageProps) => {
                     <h1 className='mt-2 text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl'>
                         Thanks for ordering
                     </h1>
+                    {order._isPaid ? (
+                    <p className='mt-2 text-base text-muted-foreground'>
+                        Your order was processed and your assets are 
+                        available to download below. We&apos;ve sent 
+                        your receipt and order details to{'  '}
+                        {typeof order.user !== "string" ? (
+                            <span className='font-medium text-gray-900'>
+                                {order.user.email}
+                            </span>
+                        ): null}
+                    </p>) : (
+                    <p className='mt-2 text-base text-muted-foreground'>
+                        We appreciate you order, and we&apos;re 
+                        currently processing it. So hang tight and 
+                        we&apos;ll send you confirmation very soon!
+                    </p>
+                    )}
+
+                    <div className='mt-16 text-sm font-medium'>
+                        <div className='text-muted-foreground'>Order nr.</div>
+                        <div className='mt-2 text-gray-900'>{order. id}</div>
+
+                        <ul className='mt-6 divide-y divide-gray-200 border-t border-gray-200 text-sm font-medium text-muted-foreground'>
+                            {(order.products as Product[]).map((product) => {
+                                const label = PRODUCT_CATEGORIES.find(
+                                    ({ value }) => value === product.category
+                                  )?.label
+
+                                  const downloadUrl = (product.product_files as ProductFile).url as string
+
+                                  const {image} = product.images[0]
+
+                                return (
+                                    <li key={product.id} className='flex space-x-6 py-6'>
+                                        <div className='relative size-24'>
+                                            {typeof image !== "string" && image.url ? (
+                                                <Image 
+                                                fill
+                                                src={image.url}
+                                                alt={`${product.name} image`}
+                                                className='flex-none rounde-md bg-gray-100 object cover object-cover'
+                                                />
+                                            ): null}
+                                        </div>
+
+                                        <div className='flex/auto flex flex-col justify-between'>
+                                            <div className='space-y-1'>
+                                                <h3 className='text-gray-900'>
+                                                    {product.name}
+                                                </h3>
+                                                <p className='my-1'>Category: {label}</p>
+                                            </div>
+
+                                            {order._isPaid? (
+                                                <a href={downloadUrl}
+                                                download={product.name}
+                                                className='text-blue-600 hover:underline underline-offset-2'
+                                                >
+                                                    Dowload asset
+                                                </a>
+                                            ) : null}
+                                        </div>
+
+                                        <p className='flex-none font-medium text-gray-900'>
+                                            {formatPrice(product.price)}
+                                        </p>
+                                    </li>
+                                )
+                            })}
+                        </ul>
+                        
+                        <div className='space-y-6 border-t border-gray-200 pt-6 text-sm font-medium text-muted-foreground'>
+                            <div className='flex justify-between'>
+                                <p>Subtotal</p>
+                                <p>{formatPrice()}</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
