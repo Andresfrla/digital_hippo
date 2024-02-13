@@ -4,9 +4,11 @@ import React from 'react'
 import { cookies } from 'next/headers'
 import { getPayloadClient } from '@/get-payload'
 import { notFound, redirect } from 'next/navigation'
-import { Product, ProductFile } from '@/payload-types'
+import { Product, ProductFile, User } from '@/payload-types'
 import { PRODUCT_CATEGORIES } from '@/config'
 import { formatPrice } from '@/lib/utils'
+import Link from 'next/link'
+import PaymentStatus from '@/components/PaymentStatus'
 
 interface PageProps {
     searchParams: {
@@ -17,6 +19,8 @@ interface PageProps {
 const ThankYouPage = async ({searchParams} : PageProps) => {
     const orderId = searchParams.orderId
     const nextCookies = cookies()
+
+    const transactionFee = 1
 
     const {user} = await getServerSideUser(nextCookies)
     const payload = await getPayloadClient()
@@ -44,7 +48,11 @@ const ThankYouPage = async ({searchParams} : PageProps) => {
         return redirect(`/sign-in?origin=thank-you?orderId=${order.id}`)
     }
 
-    const orderTotal
+    const products = order.products as Product[]
+
+    const orderTotal = products.reduce((total, product) => {
+        return total + product.price
+    }, 0)
 
   return (
     <main className='relative lg:min-h-full'>
@@ -138,9 +146,34 @@ const ThankYouPage = async ({searchParams} : PageProps) => {
                         <div className='space-y-6 border-t border-gray-200 pt-6 text-sm font-medium text-muted-foreground'>
                             <div className='flex justify-between'>
                                 <p>Subtotal</p>
-                                <p>{formatPrice()}</p>
+                                <p className='text-gray-900'>{formatPrice(orderTotal)}</p>
+                            </div>
+                            <div className='flex justify-between'>
+                                <p>Transaction Fee</p>
+                                <p className='text-gray-900'>{formatPrice(transactionFee)}</p>
+                            </div>
+
+                            <div className='flex items-center justify-between border-t border-gray-200 pt-6 text-gray-900'>
+                                <p className='text-base '>Total</p>
+                                <p className='text-base'>
+                                    {formatPrice(orderTotal + transactionFee)}
+                                </p>
                             </div>
                         </div>
+
+                        <PaymentStatus 
+                        isPaid={order._isPaid} 
+                        orderId={order.id} 
+                        orderEmail={(order.user as User).email} />
+
+                        <div className='mt-16 border-t border-gray-200 py-6 text-right'>
+                            <Link 
+                            href='/products'
+                            className='text-sm font-medium text-blue-600 hover:text-blue-500'
+                            >
+                                Continue Shopping &arr;
+                            </Link>
+                        Pa</div>
                     </div>
                 </div>
             </div>
