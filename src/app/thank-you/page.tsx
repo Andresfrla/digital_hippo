@@ -9,6 +9,7 @@ import { PRODUCT_CATEGORIES } from '@/config'
 import { formatPrice } from '@/lib/utils'
 import Link from 'next/link'
 import PaymentStatus from '@/components/PaymentStatus'
+import { transactionFee } from '../../utils/constants'
 
 interface PageProps {
     searchParams: {
@@ -19,8 +20,6 @@ interface PageProps {
 const ThankYouPage = async ({searchParams} : PageProps) => {
     const orderId = searchParams.orderId
     const nextCookies = cookies()
-
-    const transactionFee = 1
 
     const {user} = await getServerSideUser(nextCookies)
     const payload = await getPayloadClient()
